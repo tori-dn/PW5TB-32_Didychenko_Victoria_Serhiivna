@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Калькулятор Надійності та Збитків</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e6f2ff);
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      margin-bottom: 40px;
+      transition: 0.3s ease;
+    }
+
+    h2 {
+      text-align: center;
+      color: #0077cc;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #0077cc;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    .result {
+      background-color: #f1f8ff;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 10px;
+      color: #444;
+      font-size: 15px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin-top: 30px;
+      color: #004080;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Калькулятор надійності (Одноколова/Двоколова система)</h2>
+
+    <label>Ω ПЛ-110 кВ:</label><input type="number" id="PL110KVOmegaVal">
+    <label>Ω Т-110 кВ:</label><input type="number" id="T110KVOmegaVal">
+    <label>Ω В-110 кВ:</label><input type="number" id="V110KVOmegaVal">
+    <label>Ω В-10 кВ:</label><input type="number" id="V10KVOmegaVal">
+    <label>Ω шини:</label><input type="number" id="tiresOmegaVal">
+
+    <label>tв ПЛ-110 кВ:</label><input type="number" id="PL110KVTviVal">
+    <label>tв Т-110 кВ:</label><input type="number" id="T110KVTviVal">
+    <label>tв В-110 кВ:</label><input type="number" id="V110KVTviVal">
+    <label>tв В-10 кВ:</label><input type="number" id="V10KVTviVal">
+    <label>tв шини:</label><input type="number" id="tiresTviVal">
+
+    <label>Плановий K<sub>макс</sub>:</label><input type="number" id="PlannedKMaxVal">
+
+    <button id="button__first">Розрахувати надійність</button>
+
+    <div class="result">
+      <div class="section-title">Результати (Надійність):</div>
+      ΣΩ = <span id="OmegaSumVal">0</span><br>
+      t<sub>в.ос</sub> = <span id="tvosVal">0</span> год<br>
+      k<sub>а.ос</sub> ×10⁴ = <span id="kaosVal">0</span><br>
+      k<sub>п.ос</sub> ×10⁴ = <span id="kposVal">0</span><br>
+      DК<sub>ос</sub> ×10⁴ = <span id="DKOmega">0</span><br>
+      DС<sub>ос</sub> = <span id="DSOmega">0</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Калькулятор збитків від перерв електропостачання</h2>
+
+    <label>Z<sub>пер.А</sub> (грн/кВт·год):</label><input type="number" id="ZperAVal">
+    <label>Z<sub>пер.П</sub> (грн/кВт·год):</label><input type="number" id="ZperPVal">
+    <label>Ω (ΣΩ):</label><input type="number" id="OmegaVal">
+    <label>t<sub>в</sub> (год):</label><input type="number" id="tvVal">
+    <label>k<sub>п</sub>:</label><input type="number" id="kpVal">
+    <label>P<sub>м</sub> (кВт):</label><input type="number" id="PmVal">
+    <label>T<sub>м</sub> (год):</label><input type="number" id="TmVal">
+
+    <button id="button__second">Розрахувати збитки</button>
+
+    <div class="result">
+      <div class="section-title">Результати (Збитки):</div>
+      W<sub>нед.А</sub> = <span id="WnedaVal">0</span> кВт·год<br>
+      W<sub>нед.П</sub> = <span id="WnedpVal">0</span> кВт·год<br>
+      Z<sub>пер</sub> = <span id="ZperVal">0</span> грн
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('button__first').addEventListener('click', function () {
+        const getVal = id => parseFloat(document.getElementById(id).value) || 0;
+        const PL = getVal('PL110KVOmegaVal');
+        const T = getVal('T110KVOmegaVal');
+        const V110 = getVal('V110KVOmegaVal');
+        const V10 = getVal('V10KVOmegaVal');
+        const tires = getVal('tiresOmegaVal');
+
+        const tviPL = getVal('PL110KVTviVal');
+        const tviT = getVal('T110KVTviVal');
+        const tviV110 = getVal('V110KVTviVal');
+        const tviV10 = getVal('V10KVTviVal');
+        const tviTires = getVal('tiresTviVal');
+
+        const kMax = getVal('PlannedKMaxVal');
+        const OmegaSum = PL * 10 + T + V110 + V10 + 6 * tires;
+        const tvos = (PL * tviPL + T * tviT + V110 * tviV110 + V10 * tviV10 + 6 * tires * tviTires) / OmegaSum;
+        const kaos = (OmegaSum * tvos) / 8760;
+        const kpos = 1.2 * (kMax / 8760);
+        const DKOmega = 2 * OmegaSum * (kaos + kpos);
+        const DSOmega = DKOmega + V10;
+
+        document.getElementById('OmegaSumVal').textContent = OmegaSum.toFixed(4);
+        document.getElementById('tvosVal').textContent = tvos.toFixed(2);
+        document.getElementById('kaosVal').textContent = (kaos * 1e4).toFixed(2);
+        document.getElementById('kposVal').textContent = (kpos * 1e4).toFixed(2);
+        document.getElementById('DKOmega').textContent = (DKOmega * 1e4).toFixed(2);
+        document.getElementById('DSOmega').textContent = DSOmega.toFixed(4);
+      });
+
+      document.getElementById('button__second').addEventListener('click', function () {
+        const getVal = id => parseFloat(document.getElementById(id).value) || 0;
+
+        const ZperA = getVal('ZperAVal');
+        const ZperP = getVal('ZperPVal');
+        const Omega = getVal('OmegaVal');
+        const tv = getVal('tvVal');
+        const kp = getVal('kpVal');
+        const Pm = getVal('PmVal');
+        const Tm = getVal('TmVal');
+
+        const Wneda = Omega * tv * Pm * Tm;
+        const Wnedp = kp * Pm * Tm;
+        const Zper = ZperA * Wneda + ZperP * Wnedp;
+
+        document.getElementById('WnedaVal').textContent = Wneda.toFixed(2);
+        document.getElementById('WnedpVal').textContent = Wnedp.toFixed(2);
+        document.getElementById('ZperVal').textContent = Zper.toFixed(2);
+      });
+    });
+  </script>
+</body>
+</html>
